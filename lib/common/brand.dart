@@ -24,6 +24,9 @@ const brandSubscribeFlag = String.fromEnvironment(
   defaultValue: 'meta',
 );
 
+/// FlClash's first-run disclaimer names FlClash and denies providing service.
+const brandShowsDisclaimer = bool.fromEnvironment('BRAND_SHOW_DISCLAIMER');
+
 List<String> splitBrandUrls(String value) => [
   for (final url in value.split(','))
     if (url.trim().isNotEmpty) url.trim().replaceFirst(RegExp(r'/+$'), ''),

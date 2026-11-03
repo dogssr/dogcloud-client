@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/xboard.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
@@ -85,14 +86,21 @@ class Request {
     }
   }
 
-  /// Null when this build is current; throws when GitHub cannot be asked.
+  /// Null when this build is current. The brand's config.json names the
+  /// release, so an update never points users at upstream FlClash.
   Future<Map<String, dynamic>?> checkForUpdate() async {
-    final release = await latestRelease();
-    final remoteVersion = release['tag_name'] as String;
+    final config = await XboardClient(userAgent: globalState.ua).loadConfig();
+    final latest = config.latestVersion;
     final version = globalState.packageInfo.version;
-    final hasUpdate =
-        compareVersions(remoteVersion.replaceAll('v', ''), version) > 0;
-    return hasUpdate ? release : null;
+    if (latest == null || compareVersions(latest, version) <= 0) return null;
+    return {
+      'tag_name': 'v$latest',
+      'body': config.releaseNotes,
+      'html_url':
+          config.downloadUrls[Platform.operatingSystem] ??
+          config.downloadUrls['default'] ??
+          config.siteUrl,
+    };
   }
 
   /// The release page redirect still answers once the hourly API quota is spent.

@@ -46,7 +46,11 @@ class _AccountLoginViewState extends ConsumerState<AccountLoginView> {
           .read(accountProvider.notifier)
           .login(email: _email.text.trim(), password: _password.text);
       TextInput.finishAutofillContext();
-      if (mounted) Navigator.of(context).pop();
+      if (!mounted) return;
+      // A dialog opened over this page meanwhile must stay open: pop() would
+      // close that dialog instead.
+      final route = ModalRoute.of(context);
+      if (route != null) Navigator.of(context).removeRoute(route);
     } on XboardException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (e) {

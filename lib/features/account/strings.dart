@@ -26,18 +26,9 @@ class AccountStrings {
       : 'Signing out removes this account\'s subscription from this device.';
   String get refreshed => _zh ? '已更新' : 'Updated';
   String get neverExpires => _zh ? '长期有效' : 'Never expires';
-  String get download => _zh ? '下载' : 'Download';
-  String get later => _zh ? '以后再说' : 'Later';
 
   String expiresOn(String date, int days) =>
       _zh ? '$date 到期（剩 $days 天）' : 'Expires $date ($days days left)';
 
   String expiredOn(String date) => _zh ? '已于 $date 到期' : 'Expired on $date';
-
-  String updateTitle(String version) =>
-      _zh ? '发现新版本 $version' : 'Version $version is available';
-
-  String get updateMessage => _zh
-      ? '新版本修复了问题并改进了体验，建议更新。'
-      : 'This update brings fixes and improvements.';
 }

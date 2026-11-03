@@ -18,6 +18,7 @@ const _authKey = 'account.auth';
 const _emailKey = 'account.email';
 const _profileKey = 'account.profileId';
 const _subscriptionKey = 'account.subscription';
+const _seenNoticesKey = 'account.seenNotices';
 
 /// Short enough that a plan change or a node rotation on the panel reaches
 /// the client the same day.
@@ -141,6 +142,28 @@ class Account extends _$Account {
     if (message != null) {
       dialogs.showNotifier(message, level: MessageLevel.warning);
     }
+  }
+
+  Future<List<AccountNotice>> unseenPopupNotices() async {
+    final authData = state.authData;
+    if (authData == null) return const [];
+    final notices = await _xboard.notices(state.brand, authData);
+    final preferences = await SharedPreferences.getInstance();
+    final seen = preferences.getStringList(_seenNoticesKey) ?? const [];
+    return [
+      for (final notice in notices)
+        if (notice.popup && !seen.contains(notice.seenKey)) notice,
+    ];
+  }
+
+  Future<void> markNoticeSeen(AccountNotice notice) async {
+    final preferences = await SharedPreferences.getInstance();
+    final seen = preferences.getStringList(_seenNoticesKey) ?? const [];
+    await preferences.setStringList(_seenNoticesKey, [
+      for (final key in seen)
+        if (!key.startsWith('${notice.id}:')) key,
+      notice.seenKey,
+    ]);
   }
 
   Profile? _accountProfile() {

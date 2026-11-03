@@ -116,6 +116,43 @@ class BrandConfig {
   String get forgotPasswordUrl => '$siteUrl/#/forgot-password';
 }
 
+class AccountNotice {
+  const AccountNotice({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.tags,
+    required this.updatedAt,
+    required this.show,
+  });
+
+  final int id;
+  final String title;
+  final String content;
+  final List<String> tags;
+  final int updatedAt;
+  final bool show;
+
+  factory AccountNotice.fromJson(Map<String, Object?> json) {
+    return AccountNotice(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      title: json['title'] as String? ?? '',
+      content: json['content'] as String? ?? '',
+      tags: [
+        for (final tag in json['tags'] as List? ?? const [])
+          if (tag is String) tag,
+      ],
+      updatedAt: (json['updated_at'] as num?)?.toInt() ?? 0,
+      show: json['show'] != false,
+    );
+  }
+
+  /// The panel's 弹窗 tag marks a popup; editing a notice changes [seenKey].
+  bool get popup => show && tags.contains('弹窗');
+
+  String get seenKey => '$id:$updatedAt';
+}
+
 enum AccountStatus { restoring, loggedOut, loggedIn }
 
 class AccountState {

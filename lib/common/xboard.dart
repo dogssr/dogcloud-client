@@ -109,6 +109,23 @@ class XboardClient {
     return AccountSubscription.fromJson(data);
   }
 
+  Future<List<AccountNotice>> notices(
+    BrandConfig config,
+    String authData,
+  ) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/notice/fetch',
+        options: Options(headers: {'Authorization': authData}),
+      ),
+    );
+    return [
+      for (final item in data is List ? data : const [])
+        if (item is Map<String, Object?>) AccountNotice.fromJson(item),
+    ];
+  }
+
   /// Tries the last address that answered, then the rest in order. An answer
   /// from the panel, error or not, ends the search: only an unreachable
   /// address moves on to the next.
