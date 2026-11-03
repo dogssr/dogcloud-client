@@ -1,7 +1,7 @@
 name: fl_clash
 description: 狗云加速器 (DogCloud), the Dogssr client built on FlClash and ClashMeta.
 publish_to: 'none'
-version: 4.0.0+2026110302
+version: 4.0.0+2026110303
 environment:
   sdk: '>=3.10.0 <4.0.0'
 
