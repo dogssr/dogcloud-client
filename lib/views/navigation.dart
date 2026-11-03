@@ -34,6 +34,7 @@ class Navigation implements NavigationPort {
         label: PageLabel.profiles,
         builder: (_) =>
             const ProfilesView(key: GlobalObjectKey(PageLabel.profiles)),
+        modes: [NavigationItemMode.more],
       ),
       NavigationItem(
         glyph: AppGlyphs.requests,

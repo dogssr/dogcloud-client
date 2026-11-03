@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/xboard.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/features/account/purchase.dart';
+import 'package:fl_clash/features/account/section.dart';
 import 'package:fl_clash/features/account/strings.dart';
 import 'package:fl_clash/models/account.dart';
 import 'package:fl_clash/providers/account.dart';
@@ -13,7 +15,6 @@ import 'package:fl_clash/views/dashboard/style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'card.dart';
 
@@ -41,19 +42,6 @@ class AccountCard extends ConsumerWidget {
       dialogs.showNotifier(e.message, level: MessageLevel.error);
     } catch (e) {
       dialogs.showNotifier(compactError(e), level: MessageLevel.error);
-    }
-  }
-
-  Future<void> _logout(BuildContext context, WidgetRef ref) async {
-    final strings = AccountStrings.of(context);
-    final confirmed = await dialogs.showMessage(
-      title: strings.logout,
-      message: TextSpan(text: strings.logoutMessage),
-      confirmText: strings.logout,
-      destructive: true,
-    );
-    if (confirmed == true) {
-      await ref.read(accountProvider.notifier).logout();
     }
   }
 
@@ -86,7 +74,7 @@ class AccountCard extends ConsumerWidget {
               DashboardIconButton(
                 glyph: AppGlyphs.more,
                 tooltip: strings.logout,
-                onPressed: () => unawaited(_logout(context, ref)),
+                onPressed: () => unawaited(confirmLogout(context, ref)),
               ),
             ],
           ),
@@ -120,17 +108,24 @@ class AccountCard extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () => unawaited(
-                launchUrl(
-                  Uri.parse(account.brand.shopUrl),
-                  mode: LaunchMode.externalApplication,
+          Row(
+            spacing: 8,
+            children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: () => unawaited(
+                    BaseNavigator.push<void>(context, const PlansView()),
+                  ),
+                  child: Text(hasPlan ? strings.renew : strings.buyPlan),
                 ),
               ),
-              child: Text(hasPlan ? strings.renew : strings.buyPlan),
-            ),
+              Expanded(
+                child: FilledButton.tonal(
+                  onPressed: () => unawaited(checkinAndNotify(context, ref)),
+                  child: Text(strings.checkin),
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -62,7 +62,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       backgroundColor: DashboardColors.of(context).page,
       title: editing
           ? appLocalizations.editDashboard
-          : appLocalizations.dashboard,
+          : PageLabel.dashboard.label,
       actions: [if (!editing && coreLib == null) const CoreStatusButton()],
       confirmationAction: editing
           ? IconButtonData(

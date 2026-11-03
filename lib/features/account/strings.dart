@@ -1,3 +1,4 @@
+import 'package:fl_clash/models/account.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Kept out of the arb files so the brand layer merges cleanly with upstream.
@@ -31,4 +32,64 @@ class AccountStrings {
       _zh ? '$date 到期（剩 $days 天）' : 'Expires $date ($days days left)';
 
   String expiredOn(String date) => _zh ? '已于 $date 到期' : 'Expired on $date';
+
+  String get currentPlan => _zh ? '当前套餐' : 'Current';
+  String get loadFailed => _zh ? '加载失败' : 'Could not load';
+  String get retry => _zh ? '重试' : 'Retry';
+  String get period => _zh ? '购买时长' : 'Billing period';
+  String get coupon => _zh ? '优惠码' : 'Coupon';
+  String get apply => _zh ? '使用' : 'Apply';
+  String get paymentMethod => _zh ? '支付方式' : 'Payment method';
+  String get price => _zh ? '价格' : 'Price';
+  String get discount => _zh ? '优惠' : 'Discount';
+  String get fee => _zh ? '手续费' : 'Fee';
+  String get total => _zh ? '应付' : 'Total';
+  String get payment => _zh ? '支付' : 'Payment';
+  String get iPaid => _zh ? '我已支付' : 'I have paid';
+  String get cancel => _zh ? '取消' : 'Cancel';
+  String get paid => _zh ? '支付成功，套餐已开通' : 'Paid. Your plan is active.';
+  String get notPaidYet => _zh
+      ? '还没有收到支付结果。如果已经付款，请稍等片刻后在账户里刷新。'
+      : 'No payment received yet. If you paid, refresh your account shortly.';
+  String get waitingPayment => _zh
+      ? '请在打开的页面完成支付，支付成功后会自动开通。'
+      : 'Finish paying on the page that opened; the plan activates on its own.';
+  String get unpaidTitle => _zh ? '有未完成的订单' : 'Unpaid order';
+  String get continuePay => _zh ? '继续支付' : 'Pay it';
+  String get cancelAndNew => _zh ? '取消并重新下单' : 'Cancel it';
+
+  String unpaidMessage(String amount) => _zh
+      ? '你还有一个 $amount 的订单没有支付。继续支付这个订单，还是取消它重新下单？'
+      : 'An order of $amount is still unpaid. Pay it, or cancel it and order again?';
+
+  String payNow(String amount) => _zh ? '立即支付 $amount' : 'Pay $amount';
+
+  String fromPerMonth(String amount) => _zh ? '$amount/月 起' : 'From $amount/mo';
+
+  String perMonth(String amount) => _zh ? '约 $amount/月' : '$amount/mo';
+
+  String traffic(int gb) => _zh ? '$gb GB 流量' : '$gb GB data';
+
+  String devices(int? count) => count == null || count <= 0
+      ? (_zh ? '不限设备数' : 'Any number of devices')
+      : (_zh ? '$count 台设备同时在线' : '$count devices at once');
+
+  String periodName(PlanPeriod period) => switch (period) {
+    PlanPeriod.month => _zh ? '月付' : 'Monthly',
+    PlanPeriod.quarter => _zh ? '季付' : 'Quarterly',
+    PlanPeriod.halfYear => _zh ? '半年付' : 'Half-yearly',
+    PlanPeriod.year => _zh ? '年付' : 'Yearly',
+    PlanPeriod.twoYear => _zh ? '两年付' : 'Two years',
+    PlanPeriod.threeYear => _zh ? '三年付' : 'Three years',
+    PlanPeriod.onetime => _zh ? '一次性' : 'One-time',
+    PlanPeriod.reset => _zh ? '流量重置包' : 'Data reset',
+  };
+
+  String get checkin => _zh ? '签到' : 'Check in';
+  String get checkedIn => _zh ? '今日已签到' : 'Checked in';
+
+  String checkinReward(String traffic) =>
+      _zh ? '签到成功，获得 $traffic 流量' : 'Checked in: +$traffic';
 }
+
+String yuan(int cents) => '¥${(cents / 100).toStringAsFixed(2)}';

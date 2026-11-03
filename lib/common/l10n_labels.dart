@@ -1,5 +1,6 @@
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/ui/color.dart';
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app_localizations.dart';
@@ -7,11 +8,13 @@ import 'app_localizations.dart';
 extension PageLabelL10n on PageLabel {
   String get label {
     final appLocalizations = currentAppLocalizations;
+    // The brand's three tabs read as an app for using a service, not a tool.
+    final zh = Intl.getCurrentLocale().startsWith('zh');
     return switch (this) {
-      PageLabel.dashboard => appLocalizations.dashboard,
-      PageLabel.proxies => appLocalizations.proxies,
+      PageLabel.dashboard => zh ? '首页' : 'Home',
+      PageLabel.proxies => zh ? '节点' : 'Servers',
       PageLabel.profiles => appLocalizations.profiles,
-      PageLabel.tools => appLocalizations.tools,
+      PageLabel.tools => zh ? '我的' : 'Me',
       PageLabel.logs => appLocalizations.logs,
       PageLabel.requests => appLocalizations.recentRequests,
       PageLabel.resources => appLocalizations.resources,

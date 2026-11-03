@@ -116,11 +116,7 @@ const List<DashboardWidget> defaultDashboardWidgets = [
   DashboardWidget.outboundMode,
   DashboardWidget.vpnButton,
   DashboardWidget.networkTakeover,
-  DashboardWidget.intranetIp,
-  DashboardWidget.serviceStatus,
-  DashboardWidget.profiles,
   DashboardWidget.proxyGroups,
-  DashboardWidget.connectionStats,
 ];
 
 /// A phone starts without the VPN switch and the diagnostic cards, which stay
@@ -129,10 +125,9 @@ final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
     ? const [
         DashboardWidget.account,
         DashboardWidget.currentOutbound,
-        DashboardWidget.networkSpeed,
-        DashboardWidget.outboundMode,
-        DashboardWidget.profiles,
         DashboardWidget.proxyGroups,
+        DashboardWidget.outboundMode,
+        DashboardWidget.networkSpeed,
       ]
     : defaultDashboardWidgets;
 

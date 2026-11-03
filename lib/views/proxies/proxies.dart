@@ -172,7 +172,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
           ),
       ],
       menuItems: picker ? const [] : _buildMenuItems(context, style),
-      title: context.appLocalizations.proxies,
+      title: PageLabel.proxies.label,
       searchState: AppBarSearchState(onSearch: _onSearch),
       body: switch (style.type) {
         ProxiesType.tab => _tabView,

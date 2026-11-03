@@ -1,5 +1,6 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/features/account/section.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -75,6 +76,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
       appSettingProvider.select((state) => state.developerMode),
     );
     final items = [
+      const AccountSection(),
       Consumer(
         builder: (_, ref, _) {
           final state = ref.watch(moreToolsSelectorStateProvider);
@@ -90,7 +92,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
       _getOtherList(developerMode),
     ];
     return CommonScaffold(
-      title: context.appLocalizations.tools,
+      title: PageLabel.tools.label,
       body: Builder(
         builder: (context) => ListView.builder(
           key: toolsStoreKey,
