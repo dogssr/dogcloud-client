@@ -1,5 +1,6 @@
 import 'package:fl_clash/common/app_localizations.dart';
 import 'package:fl_clash/common/app_ports.dart';
+import 'package:fl_clash/common/l10n_labels.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/manager/app_manager.dart';
@@ -14,6 +15,7 @@ import 'package:fl_clash/views/config/general.dart';
 import 'package:fl_clash/views/tools.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:fl_clash/views/navigation.dart';
+import 'package:fl_clash/views/profiles/profiles.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -266,7 +268,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     expect(tester.getSize(sidebar).width, 48);
-    expect(find.text('Tools'), findsNWidgets(2));
+    expect(find.text(PageLabel.tools.label), findsNWidgets(2));
     expect(container.read(appSettingProvider).sidebarExpanded, isTrue);
     expect(tester.takeException(), isNull);
   });
@@ -423,6 +425,25 @@ void main() {
           profilesProvider.overrideWith(() => _HomeTestProfiles([profile])),
           currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
           versionProvider.overrideWithBuild((_, _) => 15),
+          // The brand opens profiles from 我的, so the page is put back here.
+          navigationItemsStateProvider.overrideWithValue(
+            NavigationItemsState(
+              value: [
+                NavigationItem(
+                  glyph: AppGlyphs.profiles,
+                  label: PageLabel.profiles,
+                  builder: (_) => const ProfilesView(
+                    key: GlobalObjectKey(PageLabel.profiles),
+                  ),
+                ),
+                NavigationItem(
+                  glyph: AppGlyphs.tools,
+                  label: PageLabel.tools,
+                  builder: (_) => const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
         ],
       );
       addTearDown(container.dispose);
