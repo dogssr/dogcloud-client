@@ -136,6 +136,79 @@ class XboardClient {
     ];
   }
 
+  Future<GuestConfig> guestConfig(BrandConfig config) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>('$base/guest/comm/config'),
+    );
+    if (data is! Map<String, Object?>) {
+      throw const XboardException('无法读取注册设置，请稍后重试');
+    }
+    return GuestConfig.fromJson(data);
+  }
+
+  Future<void> sendEmailCode(
+    BrandConfig config, {
+    required String email,
+    String? captchaToken,
+  }) async {
+    await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/passport/comm/sendEmailVerify',
+        data: {'email': email, 'turnstile_token': ?captchaToken},
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+  }
+
+  /// Returns the new account's auth data; the panel signs it in on sign-up.
+  Future<String> register(
+    BrandConfig config, {
+    required String email,
+    required String password,
+    required String emailCode,
+    String? inviteCode,
+    String? captchaToken,
+  }) async {
+    final data = await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/passport/auth/register',
+        data: {
+          'email': email,
+          'password': password,
+          'email_code': emailCode,
+          if (inviteCode != null && inviteCode.isNotEmpty)
+            'invite_code': inviteCode,
+          'turnstile_token': ?captchaToken,
+        },
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+    final authData = data is Map ? data['auth_data'] as String? : null;
+    if (authData == null || authData.isEmpty) {
+      throw const XboardException('注册失败，请稍后重试');
+    }
+    return authData;
+  }
+
+  Future<void> resetPassword(
+    BrandConfig config, {
+    required String email,
+    required String emailCode,
+    required String password,
+  }) async {
+    await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/passport/auth/forget',
+        data: {'email': email, 'email_code': emailCode, 'password': password},
+        options: Options(contentType: Headers.formUrlEncodedContentType),
+      ),
+    );
+  }
+
   Future<List<AccountPlan>> plans(BrandConfig config, String authData) async {
     final data = await _request(
       config,

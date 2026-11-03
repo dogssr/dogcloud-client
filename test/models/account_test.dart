@@ -74,4 +74,32 @@ void main() {
     expect(status.enabled, isTrue);
     expect(status.checkedToday, isFalse);
   });
+
+  test('sign-up settings name the captcha the app can show', () {
+    final turnstile = GuestConfig.fromJson({
+      'email_whitelist_suffix': ['gmail.com', 'qq.com'],
+      'is_invite_force': 0,
+      'is_captcha': 1,
+      'captcha_type': 'turnstile',
+      'turnstile_site_key': '0xKEY',
+    });
+    expect(turnstile.emailSuffixes, ['gmail.com', 'qq.com']);
+    expect(turnstile.inviteRequired, isFalse);
+    expect(turnstile.captchaRequired, isTrue);
+    expect(turnstile.turnstileSiteKey, '0xKEY');
+
+    final recaptcha = GuestConfig.fromJson({
+      'is_invite_force': 1,
+      'is_captcha': 1,
+      'captcha_type': 'recaptcha',
+      'turnstile_site_key': '0xKEY',
+    });
+    expect(recaptcha.inviteRequired, isTrue);
+    expect(recaptcha.captchaRequired, isTrue);
+    expect(recaptcha.turnstileSiteKey, isNull);
+
+    final open = GuestConfig.fromJson({'is_captcha': 0});
+    expect(open.captchaRequired, isFalse);
+    expect(open.emailSuffixes, isEmpty);
+  });
 }

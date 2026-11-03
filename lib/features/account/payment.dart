@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/xboard.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/features/account/captcha.dart';
 import 'package:fl_clash/features/account/strings.dart';
 import 'package:fl_clash/models/account.dart';
 import 'package:fl_clash/providers/account.dart';
@@ -14,9 +15,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 const _pollInterval = Duration(seconds: 3);
-
-/// webview_flutter has no Windows or Linux implementation.
-bool get _inAppWebView => system.isAndroid || system.isMacOS;
 
 /// Pays [tradeNo] and reports whether the order is paid; a page the user
 /// leaves before the panel hears from the gateway reports false.
@@ -33,7 +31,7 @@ Future<bool> payOrder(
     throw const XboardException('支付发起失败，请换一种支付方式');
   }
   if (!context.mounted) return false;
-  if (result.type == 1 && _inAppWebView) {
+  if (result.type == 1 && hasInAppWebView) {
     return await BaseNavigator.push<bool>(
           context,
           _PaymentView(url: data, tradeNo: tradeNo),

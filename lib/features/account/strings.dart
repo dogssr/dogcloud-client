@@ -85,6 +85,32 @@ class AccountStrings {
     PlanPeriod.reset => _zh ? '流量重置包' : 'Data reset',
   };
 
+  String get emailCode => _zh ? '邮箱验证码' : 'Email code';
+  String get sendCode => _zh ? '获取验证码' : 'Send code';
+  String get codeSent => _zh ? '验证码已发送，请查收邮箱' : 'Code sent; check your email';
+  String get codeRequired => _zh ? '请输入验证码' : 'Enter the code';
+  String get newPassword => _zh ? '新密码' : 'New password';
+  String get confirmPassword => _zh ? '确认密码' : 'Confirm password';
+  String get passwordTooShort => _zh ? '密码至少 8 位' : 'At least 8 characters';
+  String get passwordMismatch => _zh ? '两次输入的密码不一致' : 'Passwords do not match';
+  String get registered => _zh ? '注册成功，欢迎使用' : 'Welcome aboard';
+  String get passwordReset => _zh ? '密码已重置' : 'Password reset';
+  String get captchaTitle => _zh ? '安全验证' : 'Verification';
+  String get captchaUnavailable => _zh
+      ? '当前设备无法完成安全验证，请在官网操作'
+      : 'This device cannot show the check; use the website instead';
+
+  String inviteCode({required bool required}) => required
+      ? (_zh ? '邀请码' : 'Invite code')
+      : (_zh ? '邀请码（选填）' : 'Invite code (optional)');
+
+  String resendIn(int seconds) =>
+      _zh ? '$seconds 秒后重发' : 'Resend in ${seconds}s';
+
+  String emailSuffixes(List<String> suffixes) => _zh
+      ? '支持 ${suffixes.join('、')} 邮箱'
+      : 'Use an address at ${suffixes.join(', ')}';
+
   String get checkin => _zh ? '签到' : 'Check in';
   String get checkedIn => _zh ? '今日已签到' : 'Checked in';
 

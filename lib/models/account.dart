@@ -337,6 +337,41 @@ class CheckinStatus {
   }
 }
 
+class GuestConfig {
+  const GuestConfig({
+    required this.emailSuffixes,
+    required this.inviteRequired,
+    required this.captchaRequired,
+    required this.turnstileSiteKey,
+  });
+
+  final List<String> emailSuffixes;
+  final bool inviteRequired;
+  final bool captchaRequired;
+
+  /// Null unless the captcha is a Turnstile, the only kind the app can show.
+  final String? turnstileSiteKey;
+
+  factory GuestConfig.fromJson(Map<String, Object?> json) {
+    final captcha = json['is_captcha'] == 1 || json['is_captcha'] == true;
+    final key = json['turnstile_site_key'];
+    return GuestConfig(
+      emailSuffixes: [
+        for (final suffix
+            in json['email_whitelist_suffix'] as List? ?? const [])
+          if (suffix is String) suffix,
+      ],
+      inviteRequired:
+          json['is_invite_force'] == 1 || json['is_invite_force'] == true,
+      captchaRequired: captcha,
+      turnstileSiteKey:
+          captcha && json['captcha_type'] == 'turnstile' && key is String
+          ? key
+          : null,
+    );
+  }
+}
+
 enum AccountStatus { restoring, loggedOut, loggedIn }
 
 class AccountState {

@@ -80,6 +80,58 @@ class Account extends _$Account {
       email: email,
       password: password,
     );
+    await _signIn(config, authData, email);
+  }
+
+  Future<GuestConfig> guestConfig() async =>
+      _xboard.guestConfig(state.config ?? await loadConfig());
+
+  Future<void> sendEmailCode(String email, {String? captchaToken}) async =>
+      _xboard.sendEmailCode(
+        state.config ?? await loadConfig(),
+        email: email,
+        captchaToken: captchaToken,
+      );
+
+  Future<void> register({
+    required String email,
+    required String password,
+    required String emailCode,
+    String? inviteCode,
+    String? captchaToken,
+  }) async {
+    final config = state.config ?? await loadConfig();
+    final authData = await _xboard.register(
+      config,
+      email: email,
+      password: password,
+      emailCode: emailCode,
+      inviteCode: inviteCode,
+      captchaToken: captchaToken,
+    );
+    await _signIn(config, authData, email);
+  }
+
+  /// Resets the password, then signs in with it.
+  Future<void> resetPassword({
+    required String email,
+    required String emailCode,
+    required String password,
+  }) async {
+    await _xboard.resetPassword(
+      state.config ?? await loadConfig(),
+      email: email,
+      emailCode: emailCode,
+      password: password,
+    );
+    await login(email: email, password: password);
+  }
+
+  Future<void> _signIn(
+    BrandConfig config,
+    String authData,
+    String email,
+  ) async {
     final subscription = await _xboard.subscription(config, authData);
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_authKey, authData);

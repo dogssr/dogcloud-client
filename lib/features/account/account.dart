@@ -1,7 +1,9 @@
+export 'captcha.dart';
 export 'gate.dart';
 export 'login.dart';
 export 'notice.dart';
 export 'payment.dart';
 export 'purchase.dart';
+export 'register.dart';
 export 'section.dart';
 export 'strings.dart';

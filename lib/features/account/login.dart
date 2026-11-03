@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/xboard.dart';
+import 'package:fl_clash/features/account/captcha.dart';
+import 'package:fl_clash/features/account/register.dart';
 import 'package:fl_clash/features/account/strings.dart';
 import 'package:fl_clash/providers/account.dart';
 import 'package:fl_clash/ui/ui.dart';
@@ -60,8 +62,14 @@ class _AccountLoginViewState extends ConsumerState<AccountLoginView> {
     }
   }
 
-  void _open(String url) {
-    unawaited(launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication));
+  void _openForm(Widget form, String url) {
+    if (hasInAppWebView) {
+      unawaited(BaseNavigator.push<void>(context, form));
+    } else {
+      unawaited(
+        launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      );
+    }
   }
 
   @override
@@ -167,11 +175,17 @@ class _AccountLoginViewState extends ConsumerState<AccountLoginView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TextButton(
-                              onPressed: () => _open(brand.registerUrl),
+                              onPressed: () => _openForm(
+                                const RegisterView(),
+                                brand.registerUrl,
+                              ),
                               child: Text(strings.register),
                             ),
                             TextButton(
-                              onPressed: () => _open(brand.forgotPasswordUrl),
+                              onPressed: () => _openForm(
+                                const ResetPasswordView(),
+                                brand.forgotPasswordUrl,
+                              ),
                               child: Text(strings.forgotPassword),
                             ),
                           ],
