@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fl_clash/common/brand.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -60,7 +61,10 @@ Future<List<Group>> buildGroups(ComputeGroupsState state) async {
     final memberNames = raw['all'];
     final group = Map<String, dynamic>.from(raw);
     group['all'] = memberNames is List
-        ? memberNames.map((name) => proxies[name]).nonNulls.toList()
+        ? [
+            for (final name in memberNames)
+              if (!isPanelInfoProxy(name)) ?proxies[name],
+          ]
         : const [];
     groups.add(Group.fromJson(group));
   }

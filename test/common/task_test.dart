@@ -71,6 +71,36 @@ void main() {
     expect(groups.single.all.map((proxy) => proxy.name), ['Beta', 'Zulu']);
   });
 
+  test('the panel\'s plan info nodes stay out of the groups', () async {
+    final groups = await toGroupsTask(
+      const ComputeGroupsState(
+        proxiesData: ProxiesData(
+          all: ['Select'],
+          proxies: {
+            'Select': {
+              'name': 'Select',
+              'type': 'Selector',
+              'now': '剩余流量：100 GB',
+              'all': ['剩余流量：100 GB', '套餐到期：2026-12-01', 'HK 01'],
+            },
+            '剩余流量：100 GB': {'name': '剩余流量：100 GB', 'type': 'Shadowsocks'},
+            '套餐到期：2026-12-01': {
+              'name': '套餐到期：2026-12-01',
+              'type': 'Shadowsocks',
+            },
+            'HK 01': {'name': 'HK 01', 'type': 'Shadowsocks'},
+          },
+        ),
+        sortType: ProxiesSortType.none,
+        delayMap: {},
+        selectedMap: {},
+        defaultTestUrl: 'https://example.com/generate_204',
+      ),
+    );
+
+    expect(groups.single.all.map((proxy) => proxy.name), ['HK 01']);
+  });
+
   test(
     'clashConfigTask parses core config data off the main isolate',
     () async {

@@ -33,3 +33,10 @@ List<String> splitBrandUrls(String value) => [
   for (final url in value.split(','))
     if (url.trim().isNotEmpty) url.trim().replaceFirst(RegExp(r'/+$'), ''),
 ];
+
+/// Xboard prepends copies of the first node renamed to show the remaining
+/// data, the reset day and the expiry, which the account card already shows.
+const _panelInfoPrefixes = ['剩余流量：', '距离下次重置剩余：', '套餐到期：'];
+
+bool isPanelInfoProxy(Object? name) =>
+    name is String && _panelInfoPrefixes.any(name.startsWith);
