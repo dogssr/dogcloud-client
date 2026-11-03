@@ -160,6 +160,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./dist/**/*
+          prerelease: ${{ contains(github.ref_name, '-') }}
           body: |
             狗云加速器 ${{ github.ref_name }}
 
