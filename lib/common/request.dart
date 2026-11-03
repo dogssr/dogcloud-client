@@ -8,6 +8,7 @@ import 'package:dio/io.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/xboard.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/models/account.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
@@ -89,7 +90,8 @@ class Request {
   /// Null when this build is current. The brand's config.json names the
   /// release, so an update never points users at upstream FlClash.
   Future<Map<String, dynamic>?> checkForUpdate() async {
-    final config = await XboardClient(userAgent: globalState.ua).loadConfig();
+    final config =
+        (await XboardClient.fetchConfig(dio))?.config ?? BrandConfig.defaults;
     final latest = config.latestVersion;
     final version = globalState.packageInfo.version;
     if (latest == null || compareVersions(latest, version) <= 0) return null;

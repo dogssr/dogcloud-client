@@ -37,11 +37,13 @@ class XboardClient {
 
   /// Remote config first; a cached copy, then the build defaults, when no
   /// mirror answers.
-  Future<BrandConfig> loadConfig() async {
-    final preferences = await SharedPreferences.getInstance();
+  /// The first config mirror that answers, with its raw body for caching.
+  static Future<({BrandConfig config, String body})?> fetchConfig(
+    Dio dio,
+  ) async {
     for (final url in splitBrandUrls(brandConfigUrls)) {
       try {
-        final response = await _dio.get<String>(
+        final response = await dio.get<String>(
           url,
           options: Options(
             responseType: ResponseType.plain,
@@ -52,14 +54,22 @@ class XboardClient {
         final config = BrandConfig.fromJson(
           json.decode(body) as Map<String, Object?>,
         );
-        await preferences.setString(_configKey, body);
-        return config;
+        return (config: config, body: body);
       } catch (e) {
         commonPrint.log(
           'brand config $url: ${compactError(e)}',
           logLevel: LogLevel.warning,
         );
       }
+    }
+    return null;
+  }
+
+  Future<BrandConfig> loadConfig() async {
+    final preferences = await SharedPreferences.getInstance();
+    if (await fetchConfig(_dio) case (:final config, :final body)) {
+      await preferences.setString(_configKey, body);
+      return config;
     }
     final cached = preferences.getString(_configKey);
     if (cached != null) {
