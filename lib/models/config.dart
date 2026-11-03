@@ -110,6 +110,7 @@ final List<HotKeyAction> defaultHotKeyActions = system.isWindows
       ];
 
 const List<DashboardWidget> defaultDashboardWidgets = [
+  DashboardWidget.account,
   DashboardWidget.currentOutbound,
   DashboardWidget.networkSpeed,
   DashboardWidget.outboundMode,
@@ -126,6 +127,7 @@ const List<DashboardWidget> defaultDashboardWidgets = [
 /// addable. The field default keeps the shared list because it must be const.
 final List<DashboardWidget> platformDefaultDashboardWidgets = system.isAndroid
     ? const [
+        DashboardWidget.account,
         DashboardWidget.currentOutbound,
         DashboardWidget.networkSpeed,
         DashboardWidget.outboundMode,

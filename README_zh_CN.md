@@ -1,3 +1,8 @@
+> **狗云加速器** 基于 [FlClash](https://github.com/chen08209/FlClash) v0.9.2 修改，
+> 修改者：狗云（Dogssr），2026-11-03 起。主要改动：狗云账号登录、自动导入订阅、
+> 仪表盘账户卡片、备用配置源与更新提示、品牌名称与图标。
+> 本项目与原作者无关，依照 [GPL-3.0](LICENSE) 发布，源码完整公开。
+
 <div align="center">
 
 <img src="assets/images/icon.png" alt="FlClash" width="88">

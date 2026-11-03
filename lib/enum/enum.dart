@@ -481,6 +481,7 @@ enum FunctionTag {
 }
 
 enum DashboardWidget {
+  account,
   currentOutbound,
   networkSpeed,
   outboundMode,

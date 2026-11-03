@@ -13,7 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>狗云加速器</string>
+	<key>CFBundleDisplayName</key>
+	<string>狗云加速器</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -44,6 +46,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>FlClash needs location access to detect WiFi network name for connectivity features.</string>
+	<string>狗云加速器 needs location access to detect WiFi network name for connectivity features.</string>
 </dict>
 </plist>

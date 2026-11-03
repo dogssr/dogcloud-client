@@ -1,3 +1,9 @@
+> **DogCloud (狗云加速器)** is a modified version of [FlClash](https://github.com/chen08209/FlClash) v0.9.2,
+> changed by Dogssr starting 2026-11-03: account sign-in for the Dogssr panel, automatic
+> subscription import, an account card on the dashboard, fallback config and update
+> prompts, and its own name and icons. It is not affiliated with the FlClash authors
+> and is released under [GPL-3.0](LICENSE) with its full source.
+
 <div align="center">
 
 <img src="assets/images/icon.png" alt="FlClash" width="88">

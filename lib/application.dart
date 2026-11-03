@@ -7,6 +7,7 @@ import 'package:fl_clash/common/window.dart';
 import 'package:fl_clash/bootstrap.dart';
 import 'package:fl_clash/common/system_dns.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/features/account/account.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/manager/hotkey_manager.dart';
 import 'package:fl_clash/manager/manager.dart';
@@ -179,7 +180,7 @@ class ApplicationState extends ConsumerState<Application> {
             );
           },
           scrollBehavior: const BaseScrollBehavior(),
-          title: appName,
+          title: appDisplayName,
           locale: getLocaleForString(locale),
           supportedLocales: AppLocalizations.delegate.supportedLocales,
           themeMode: themeProps.themeMode,
@@ -189,7 +190,7 @@ class ApplicationState extends ConsumerState<Application> {
           home: KeyboardInsetHold(child: child!),
         );
       },
-      child: const HomePage(),
+      child: const AccountGate(child: HomePage()),
     );
   }
 

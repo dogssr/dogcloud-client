@@ -1,11 +1,13 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/features/account/strings.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/views/dashboard/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 
 extension DashboardWidgetView on DashboardWidget {
   Widget get card => switch (this) {
+    DashboardWidget.account => const AccountCard(),
     DashboardWidget.currentOutbound => const CurrentOutboundCard(),
     DashboardWidget.networkSpeed => const NetworkSpeedCard(),
     DashboardWidget.outboundMode => const OutboundModeCard(),
@@ -20,6 +22,7 @@ extension DashboardWidgetView on DashboardWidget {
   };
 
   Glyph get glyph => switch (this) {
+    DashboardWidget.account => AppGlyphs.account,
     DashboardWidget.currentOutbound => AppGlyphs.status,
     DashboardWidget.networkSpeed => AppGlyphs.speed,
     DashboardWidget.outboundMode => AppGlyphs.split,
@@ -36,6 +39,7 @@ extension DashboardWidgetView on DashboardWidget {
   String label(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     return switch (this) {
+      DashboardWidget.account => AccountStrings.of(context).account,
       DashboardWidget.currentOutbound => appLocalizations.status,
       DashboardWidget.networkSpeed => appLocalizations.networkSpeed,
       DashboardWidget.outboundMode => appLocalizations.outboundMode,

@@ -142,6 +142,7 @@ const _$EditorFontSizeEnumMap = {
 };
 
 const _$DashboardWidgetEnumMap = {
+  DashboardWidget.account: 'account',
   DashboardWidget.currentOutbound: 'currentOutbound',
   DashboardWidget.networkSpeed: 'networkSpeed',
   DashboardWidget.outboundMode: 'outboundMode',
