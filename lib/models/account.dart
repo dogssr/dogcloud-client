@@ -372,6 +372,149 @@ class GuestConfig {
   }
 }
 
+class GuideArticle {
+  const GuideArticle({
+    required this.id,
+    required this.category,
+    required this.title,
+    required this.body,
+  });
+
+  final int id;
+  final String category;
+  final String title;
+  final String body;
+
+  factory GuideArticle.fromJson(Map<String, Object?> json) {
+    return GuideArticle(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      category: json['category'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+    );
+  }
+}
+
+class TicketMessage {
+  const TicketMessage({
+    required this.mine,
+    required this.message,
+    required this.createdAt,
+  });
+
+  final bool mine;
+  final String message;
+  final DateTime createdAt;
+
+  factory TicketMessage.fromJson(Map<String, Object?> json) {
+    return TicketMessage(
+      mine: json['is_me'] == true,
+      message: json['message'] as String? ?? '',
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        ((json['created_at'] as num?)?.toInt() ?? 0) * 1000,
+      ),
+    );
+  }
+}
+
+class AccountTicket {
+  const AccountTicket({
+    required this.id,
+    required this.subject,
+    required this.closed,
+    required this.replied,
+    required this.updatedAt,
+    required this.messages,
+  });
+
+  final int id;
+  final String subject;
+  final bool closed;
+
+  /// The last word is the panel's.
+  final bool replied;
+  final DateTime updatedAt;
+  final List<TicketMessage> messages;
+
+  factory AccountTicket.fromJson(Map<String, Object?> json) {
+    return AccountTicket(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      subject: json['subject'] as String? ?? '',
+      closed: (json['status'] as num?)?.toInt() == 1,
+      replied: (json['reply_status'] as num?)?.toInt() == 1,
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        ((json['updated_at'] as num?)?.toInt() ?? 0) * 1000,
+      ),
+      messages: [
+        for (final item in json['message'] as List? ?? const [])
+          if (item is Map<String, Object?>) TicketMessage.fromJson(item),
+      ],
+    );
+  }
+}
+
+class InviteInfo {
+  const InviteInfo({
+    required this.codes,
+    required this.invited,
+    required this.earned,
+    required this.rate,
+    required this.balance,
+  });
+
+  final List<String> codes;
+  final int invited;
+
+  /// Cents.
+  final int earned;
+  final int rate;
+  final int balance;
+
+  /// Xboard's stat list: invited, earned, pending, rate, balance.
+  factory InviteInfo.fromJson(Map<String, Object?> json) {
+    final stat = [
+      for (final value in json['stat'] as List? ?? const [])
+        (value as num?)?.toInt() ?? 0,
+    ];
+    int at(int index) => index < stat.length ? stat[index] : 0;
+    return InviteInfo(
+      codes: [
+        for (final code in json['codes'] as List? ?? const [])
+          if (code is Map && code['code'] is String) code['code'] as String,
+      ],
+      invited: at(0),
+      earned: at(1),
+      rate: at(3),
+      balance: at(4),
+    );
+  }
+}
+
+class BrandCoupon {
+  const BrandCoupon({
+    required this.code,
+    required this.label,
+    required this.title,
+    required this.endsAt,
+  });
+
+  final String code;
+  final String label;
+  final String title;
+  final DateTime endsAt;
+
+  factory BrandCoupon.fromJson(Map<String, Object?> json) {
+    return BrandCoupon(
+      code: json['code'] as String? ?? '',
+      label: json['label'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      endsAt: DateTime.fromMillisecondsSinceEpoch(
+        ((json['ended_at'] as num?)?.toInt() ?? 0) * 1000,
+      ),
+    );
+  }
+}
+
 enum AccountStatus { restoring, loggedOut, loggedIn }
 
 class AccountState {

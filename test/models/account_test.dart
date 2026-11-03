@@ -102,4 +102,55 @@ void main() {
     expect(open.captchaRequired, isFalse);
     expect(open.emailSuffixes, isEmpty);
   });
+
+  test('tickets, invites and coupons read the panel fields', () {
+    final ticket = AccountTicket.fromJson({
+      'id': 7,
+      'subject': '无法连接',
+      'status': 0,
+      'reply_status': 1,
+      'updated_at': 1700000000,
+      'message': [
+        {'is_me': true, 'message': '连不上', 'created_at': 1699990000},
+        {'is_me': false, 'message': '已处理', 'created_at': 1700000000},
+      ],
+    });
+    expect(ticket.closed, isFalse);
+    expect(ticket.replied, isTrue);
+    expect(ticket.messages.map((message) => message.mine), [true, false]);
+    expect(
+      ticket.messages.last.createdAt,
+      DateTime.fromMillisecondsSinceEpoch(1700000000 * 1000),
+    );
+
+    final invite = InviteInfo.fromJson({
+      'codes': [
+        {'code': 'abc123'},
+      ],
+      'stat': [3, 1500, 200, 20, 800],
+    });
+    expect(invite.codes, ['abc123']);
+    expect(invite.invited, 3);
+    expect(invite.earned, 1500);
+    expect(invite.rate, 20);
+    expect(invite.balance, 800);
+    expect(
+      InviteInfo.fromJson({
+        'stat': [1],
+      }).balance,
+      0,
+    );
+
+    final coupon = BrandCoupon.fromJson({
+      'code': 'DOG20',
+      'label': '8 折',
+      'title': '新用户',
+      'ended_at': 1700000000,
+    });
+    expect(coupon.code, 'DOG20');
+    expect(
+      coupon.endsAt,
+      DateTime.fromMillisecondsSinceEpoch(1700000000 * 1000),
+    );
+  });
 }

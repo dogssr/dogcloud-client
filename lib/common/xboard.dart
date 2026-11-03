@@ -209,6 +209,159 @@ class XboardClient {
     );
   }
 
+  Future<List<GuideArticle>> guides(BrandConfig config, String authData) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/knowledge/fetch',
+        queryParameters: {'language': 'zh-CN'},
+        options: _auth(authData),
+      ),
+    );
+    return [
+      if (data is Map)
+        for (final items in data.values)
+          for (final item in items is List ? items : const [])
+            if (item is Map<String, Object?>) GuideArticle.fromJson(item),
+    ];
+  }
+
+  Future<GuideArticle> guide(
+    BrandConfig config,
+    String authData,
+    int id,
+  ) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/knowledge/fetch',
+        queryParameters: {'id': id},
+        options: _auth(authData),
+      ),
+    );
+    if (data is! Map<String, Object?>) {
+      throw const XboardException('文章不存在');
+    }
+    return GuideArticle.fromJson(data);
+  }
+
+  Future<List<AccountTicket>> tickets(
+    BrandConfig config,
+    String authData,
+  ) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/ticket/fetch',
+        options: _auth(authData),
+      ),
+    );
+    return [
+      for (final item in data is List ? data : const [])
+        if (item is Map<String, Object?>) AccountTicket.fromJson(item),
+    ];
+  }
+
+  Future<AccountTicket> ticket(
+    BrandConfig config,
+    String authData,
+    int id,
+  ) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/ticket/fetch',
+        queryParameters: {'id': id},
+        options: _auth(authData),
+      ),
+    );
+    if (data is! Map<String, Object?>) {
+      throw const XboardException('工单不存在');
+    }
+    return AccountTicket.fromJson(data);
+  }
+
+  Future<void> createTicket(
+    BrandConfig config,
+    String authData, {
+    required String subject,
+    required String message,
+  }) async {
+    await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/ticket/save',
+        data: {'subject': subject, 'level': 1, 'message': message},
+        options: _auth(authData, form: true),
+      ),
+    );
+  }
+
+  Future<void> replyTicket(
+    BrandConfig config,
+    String authData, {
+    required int id,
+    required String message,
+  }) async {
+    await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/ticket/reply',
+        data: {'id': id, 'message': message},
+        options: _auth(authData, form: true),
+      ),
+    );
+  }
+
+  Future<void> closeTicket(BrandConfig config, String authData, int id) async {
+    await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/ticket/close',
+        data: {'id': id},
+        options: _auth(authData, form: true),
+      ),
+    );
+  }
+
+  Future<InviteInfo> invite(BrandConfig config, String authData) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/invite/fetch',
+        options: _auth(authData),
+      ),
+    );
+    if (data is! Map<String, Object?>) {
+      throw const XboardException('邀请信息读取失败');
+    }
+    return InviteInfo.fromJson(data);
+  }
+
+  Future<void> createInviteCode(BrandConfig config, String authData) async {
+    await _request(
+      config,
+      (base) =>
+          _dio.get<Object?>('$base/user/invite/save', options: _auth(authData)),
+    );
+  }
+
+  /// Personal coupons from the panel's OpsBot plugin.
+  Future<List<BrandCoupon>> coupons(BrandConfig config, String authData) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/opsbot/coupons',
+        options: _auth(authData),
+      ),
+    );
+    final coupons = data is Map ? data['coupons'] : null;
+    return [
+      for (final item in coupons is List ? coupons : const [])
+        if (item is Map<String, Object?>) BrandCoupon.fromJson(item),
+    ];
+  }
+
   Future<List<AccountPlan>> plans(BrandConfig config, String authData) async {
     final data = await _request(
       config,

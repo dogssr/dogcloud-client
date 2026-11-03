@@ -37,7 +37,7 @@ void main() {
   });
 
   testWidgets(
-    'notice Markdown keeps text and links but drops images and tags',
+    'notice Markdown keeps text and links but drops images, tags and fences',
     (tester) async {
       late InlineSpan span;
       final recognizers = <TapGestureRecognizer>[];
@@ -53,7 +53,8 @@ void main() {
               span = noticeSpan(
                 context,
                 '## 标题\r\n\r\n- **加粗** 和 `代码`\n'
-                '[点击获取](https://id.dogssr.com)<br>![图](https://x.y/z.png)',
+                '[点击获取](https://id.dogssr.com)<br>![图](https://x.y/z.png)\n'
+                '> 引用\n```\nclash://install\n```',
                 recognizers,
               );
               return const SizedBox();
@@ -62,7 +63,7 @@ void main() {
         ),
       );
 
-      expect(span.toPlainText(), '标题\n\n• 加粗 和 代码\n点击获取');
+      expect(span.toPlainText(), '标题\n\n• 加粗 和 代码\n点击获取\n引用\nclash://install');
       expect(recognizers, hasLength(1));
     },
   );

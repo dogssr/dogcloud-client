@@ -214,6 +214,46 @@ class Account extends _$Account {
     }
   }
 
+  Future<List<GuideArticle>> guides() => _signedIn(_xboard.guides);
+
+  Future<GuideArticle> guide(int id) =>
+      _signedIn((config, authData) => _xboard.guide(config, authData, id));
+
+  Future<List<AccountNotice>> notices() => _signedIn(_xboard.notices);
+
+  Future<List<AccountTicket>> tickets() => _signedIn(_xboard.tickets);
+
+  Future<AccountTicket> ticket(int id) =>
+      _signedIn((config, authData) => _xboard.ticket(config, authData, id));
+
+  Future<void> createTicket(String subject, String message) => _signedIn(
+    (config, authData) => _xboard.createTicket(
+      config,
+      authData,
+      subject: subject,
+      message: message,
+    ),
+  );
+
+  Future<void> replyTicket(int id, String message) => _signedIn(
+    (config, authData) =>
+        _xboard.replyTicket(config, authData, id: id, message: message),
+  );
+
+  Future<void> closeTicket(int id) => _signedIn(
+    (config, authData) => _xboard.closeTicket(config, authData, id),
+  );
+
+  /// Creates the first invite code on demand, as the panel's site does.
+  Future<InviteInfo> invite() async {
+    final info = await _signedIn(_xboard.invite);
+    if (info.codes.isNotEmpty) return info;
+    await _signedIn(_xboard.createInviteCode);
+    return _signedIn(_xboard.invite);
+  }
+
+  Future<List<BrandCoupon>> coupons() => _signedIn(_xboard.coupons);
+
   Future<List<AccountPlan>> plans() => _signedIn(_xboard.plans);
 
   Future<List<PaymentMethod>> paymentMethods() =>

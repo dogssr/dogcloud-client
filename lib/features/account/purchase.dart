@@ -26,7 +26,9 @@ String _planText(String html) => html
     .trim();
 
 class PlansView extends ConsumerStatefulWidget {
-  const PlansView({super.key});
+  const PlansView({super.key, this.couponCode});
+
+  final String? couponCode;
 
   @override
   ConsumerState<PlansView> createState() => _PlansViewState();
@@ -89,6 +91,7 @@ class _PlansViewState extends ConsumerState<PlansView> {
                         PlanCheckoutView(
                           plan: plan,
                           current: plan.id == currentPlanId,
+                          couponCode: widget.couponCode,
                         ),
                       ),
                     ),
@@ -197,9 +200,11 @@ class PlanCheckoutView extends ConsumerStatefulWidget {
     super.key,
     required this.plan,
     required this.current,
+    this.couponCode,
   });
 
   final AccountPlan plan;
+  final String? couponCode;
 
   /// Only the account's own plan sells a data reset.
   final bool current;
@@ -227,6 +232,10 @@ class _PlanCheckoutViewState extends ConsumerState<PlanCheckoutView> {
     ];
     _period = _periods.first;
     unawaited(_loadMethods());
+    if (widget.couponCode case final code? when code.isNotEmpty) {
+      _couponController.text = code;
+      unawaited(_applyCoupon());
+    }
   }
 
   @override
@@ -261,16 +270,27 @@ class _PlanCheckoutViewState extends ConsumerState<PlanCheckoutView> {
   Future<void> _applyCoupon() async {
     final code = _couponController.text.trim();
     if (code.isEmpty || _checkingCoupon) return;
+    final period = _period;
     setState(() => _checkingCoupon = true);
     try {
-      final coupon = await _account.checkCoupon(code, widget.plan, _period);
-      if (mounted) setState(() => _coupon = coupon);
+      final coupon = await _account.checkCoupon(code, widget.plan, period);
+      if (mounted && period == _period) setState(() => _coupon = coupon);
     } catch (e) {
       if (mounted) setState(() => _coupon = null);
       _notifyError(e);
     } finally {
       if (mounted) setState(() => _checkingCoupon = false);
     }
+  }
+
+  /// A coupon can be limited to some periods, so it is checked again.
+  void _selectPeriod(PlanPeriod period) {
+    final hadCoupon = _coupon != null;
+    setState(() {
+      _period = period;
+      _coupon = null;
+    });
+    if (hadCoupon) unawaited(_applyCoupon());
   }
 
   Future<void> _pay() async {
@@ -359,10 +379,7 @@ class _PlanCheckoutViewState extends ConsumerState<PlanCheckoutView> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: CommonCard(
                       isSelected: period == _period,
-                      onPressed: () => setState(() {
-                        _period = period;
-                        _coupon = null;
-                      }),
+                      onPressed: () => _selectPeriod(period),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,

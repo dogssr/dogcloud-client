@@ -111,6 +111,56 @@ class AccountStrings {
       ? '支持 ${suffixes.join('、')} 邮箱'
       : 'Use an address at ${suffixes.join(', ')}';
 
+  String get notices => _zh ? '网站公告' : 'Announcements';
+  String get guides => _zh ? '使用教程' : 'Guides';
+  String get coupons => _zh ? '我的优惠券' : 'My coupons';
+  String get useCoupon => _zh ? '去使用' : 'Use';
+  String get exclusiveCoupon => _zh ? '专属优惠券' : 'Just for you';
+
+  String couponName(String label) => _zh ? '$label优惠券' : '$label coupon';
+
+  String get invite => _zh ? '邀请返利' : 'Invite friends';
+  String get inviteLink => _zh ? '邀请链接' : 'Invite link';
+  String get copy => _zh ? '复制' : 'Copy';
+  String get copied => _zh ? '已复制' : 'Copied';
+  String get earned => _zh ? '累计返利' : 'Earned';
+  String get balance => _zh ? '返利余额' : 'Balance';
+  String get tickets => _zh ? '工单' : 'Support tickets';
+  String get newTicket => _zh ? '新建工单' : 'New ticket';
+  String get subject => _zh ? '标题' : 'Subject';
+  String get message => _zh ? '描述你的问题' : 'Describe the problem';
+  String get send => _zh ? '发送' : 'Send';
+  String get closeTicket => _zh ? '关闭工单' : 'Close ticket';
+  String get closeTicketMessage => _zh
+      ? '关闭后不能再回复，确定要关闭这个工单吗？'
+      : 'A closed ticket takes no more replies. Close it?';
+  String get ticketCreated =>
+      _zh ? '工单已提交，我们会尽快回复' : 'Sent; we will reply soon';
+  String get replyHint => _zh ? '输入回复' : 'Reply';
+  String get subjectRequired => _zh ? '请填写标题' : 'Add a subject';
+  String get messageRequired => _zh ? '请描述你遇到的问题' : 'Describe the problem';
+  String get nothingHere => _zh ? '暂时没有内容' : 'Nothing here yet';
+  String get support => _zh ? '客服' : 'Support';
+  String get required => _zh ? '必填' : 'Required';
+  String get help => _zh ? '帮助' : 'Help';
+
+  String ticketStatus(AccountTicket ticket) => ticket.closed
+      ? (_zh ? '已关闭' : 'Closed')
+      : ticket.replied
+      ? (_zh ? '客服已回复' : 'Answered')
+      : (_zh ? '等待客服回复' : 'Waiting for support');
+
+  String invited(int count) => _zh ? '已邀请 $count 人' : '$count invited';
+
+  String commissionRate(int rate) => _zh ? '返利比例 $rate%' : '$rate% commission';
+
+  String timeLeft(Duration left) {
+    final days = left.inDays;
+    final hours = left.inHours % 24;
+    if (_zh) return days > 0 ? '剩 $days 天 $hours 小时' : '剩 ${left.inHours} 小时';
+    return days > 0 ? '${days}d ${hours}h left' : '${left.inHours}h left';
+  }
+
   String get checkin => _zh ? '签到' : 'Check in';
   String get checkedIn => _zh ? '今日已签到' : 'Checked in';
 

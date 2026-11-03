@@ -10,6 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 final _heading = RegExp(r'^#{1,6}\s+(.*)$');
 final _bullet = RegExp(r'^\s*[-*+]\s+(.*)$');
 final _tag = RegExp(r'<[^>]+>');
+final _quote = RegExp(r'^\s*>\s?');
+final _fence = RegExp(r'^\s*```');
 final _inline = RegExp(
   r'\*\*(.+?)\*\*|`([^`]+)`|!\[[^\]]*\]\([^)]*\)|\[([^\]]+)\]\(([^)\s]+)\)',
 );
@@ -47,9 +49,12 @@ InlineSpan noticeSpan(
     decorationColor: primary,
   );
   final children = <InlineSpan>[];
-  final lines = markdown.replaceAll('\r\n', '\n').trim().split('\n');
+  final lines = [
+    for (final line in markdown.replaceAll('\r\n', '\n').trim().split('\n'))
+      if (!_fence.hasMatch(line)) line,
+  ];
   for (final (index, raw) in lines.indexed) {
-    final line = raw.replaceAll(_tag, '').trimRight();
+    final line = raw.replaceAll(_tag, '').replaceFirst(_quote, '').trimRight();
     if (index > 0) children.add(const TextSpan(text: '\n'));
     if (_heading.firstMatch(line) case final match?) {
       children.add(TextSpan(text: match.group(1), style: heading));
