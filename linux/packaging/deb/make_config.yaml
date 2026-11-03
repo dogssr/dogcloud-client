@@ -1,8 +1,8 @@
 display_name: 狗云加速器
 package_name: dogcloud
 maintainer:
-  name: chen08209
-  email: chen08209@gmail.com
+  name: Dogssr
+  email: noreply@dogssr.com
 
 priority: optional
 section: x11

@@ -1,8 +1,8 @@
 display_name: 狗云加速器
 
-packager: chen08209
-packagerEmail: chen08209@gmail.com
-license: Other
+packager: Dogssr
+packagerEmail: noreply@dogssr.com
+license: GPL-3.0-only
 
 priority: optional
 section: x11

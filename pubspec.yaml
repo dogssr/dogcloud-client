@@ -1,5 +1,5 @@
 name: fl_clash
-description: A multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free.
+description: 狗云加速器 (DogCloud), the Dogssr client built on FlClash and ClashMeta.
 publish_to: 'none'
 version: 4.0.0+2026110301
 environment:
