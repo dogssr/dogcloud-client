@@ -1,6 +1,8 @@
 const brandApiUrls = String.fromEnvironment(
   'BRAND_API_URLS',
-  defaultValue: 'https://web2.dogssr.site/api/v1,https://035888.xyz/api/v1',
+  defaultValue:
+      'https://web8.dogssr.site/api/v1,https://035888.xyz/api/v1,'
+      'https://web2.dogssr.site/api/v1',
 );
 
 const brandConfigUrls = String.fromEnvironment(
