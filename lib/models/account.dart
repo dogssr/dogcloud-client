@@ -3,6 +3,7 @@ import 'package:fl_clash/common/brand.dart';
 class AccountSubscription {
   const AccountSubscription({
     required this.email,
+    required this.planId,
     required this.planName,
     required this.expiredAt,
     required this.used,
@@ -11,6 +12,7 @@ class AccountSubscription {
   });
 
   final String email;
+  final int? planId;
   final String? planName;
 
   /// Null for a plan that never expires.
@@ -24,6 +26,7 @@ class AccountSubscription {
     final expiredAt = (json['expired_at'] as num?)?.toInt();
     return AccountSubscription(
       email: json['email'] as String? ?? '',
+      planId: (json['plan_id'] as num?)?.toInt(),
       planName: plan is Map ? plan['name'] as String? : null,
       expiredAt: expiredAt == null || expiredAt <= 0
           ? null
@@ -38,6 +41,7 @@ class AccountSubscription {
 
   Map<String, Object?> toJson() => {
     'email': email,
+    'plan_id': planId,
     'plan': planName == null ? null : {'name': planName},
     'expired_at': expiredAt == null
         ? null
@@ -151,6 +155,186 @@ class AccountNotice {
   bool get popup => show && tags.contains('弹窗');
 
   String get seenKey => '$id:$updatedAt';
+}
+
+/// Xboard's order API still names periods by their legacy price columns.
+enum PlanPeriod {
+  month('month_price', 1),
+  quarter('quarter_price', 3),
+  halfYear('half_year_price', 6),
+  year('year_price', 12),
+  twoYear('two_year_price', 24),
+  threeYear('three_year_price', 36),
+  onetime('onetime_price', 0),
+  reset('reset_price', 0);
+
+  const PlanPeriod(this.key, this.months);
+
+  final String key;
+  final int months;
+}
+
+class AccountPlan {
+  const AccountPlan({
+    required this.id,
+    required this.name,
+    required this.tags,
+    required this.content,
+    required this.transferGb,
+    required this.deviceLimit,
+    required this.prices,
+  });
+
+  final int id;
+  final String name;
+  final List<String> tags;
+  final String content;
+  final int transferGb;
+  final int? deviceLimit;
+
+  /// Cents, in [PlanPeriod] order; periods the plan does not sell are absent.
+  final Map<PlanPeriod, int> prices;
+
+  factory AccountPlan.fromJson(Map<String, Object?> json) {
+    return AccountPlan(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String? ?? '',
+      tags: [
+        for (final tag in json['tags'] as List? ?? const [])
+          if (tag is String) tag,
+      ],
+      content: json['content'] as String? ?? '',
+      transferGb: (json['transfer_enable'] as num?)?.toInt() ?? 0,
+      deviceLimit: (json['device_limit'] as num?)?.toInt(),
+      prices: {
+        for (final period in PlanPeriod.values)
+          if ((json[period.key] as num?)?.round() case final cents?
+              when cents > 0)
+            period: cents,
+      },
+    );
+  }
+
+  /// The lowest price per month among the periods a plan renews by.
+  int? get monthlyFrom {
+    final monthly = [
+      for (final MapEntry(key: period, value: cents) in prices.entries)
+        if (period.months > 0) cents ~/ period.months,
+    ];
+    return monthly.isEmpty ? null : monthly.reduce((a, b) => a < b ? a : b);
+  }
+}
+
+class PaymentMethod {
+  const PaymentMethod({
+    required this.id,
+    required this.name,
+    required this.feePercent,
+    required this.feeFixed,
+  });
+
+  final int id;
+  final String name;
+  final double feePercent;
+  final int feeFixed;
+
+  factory PaymentMethod.fromJson(Map<String, Object?> json) {
+    return PaymentMethod(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: json['name'] as String? ?? '',
+      feePercent: double.tryParse('${json['handling_fee_percent'] ?? 0}') ?? 0,
+      feeFixed: (json['handling_fee_fixed'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  int feeFor(int cents) =>
+      cents <= 0 ? 0 : (cents * feePercent / 100).round() + feeFixed;
+}
+
+class AccountCoupon {
+  const AccountCoupon({
+    required this.code,
+    required this.name,
+    required this.type,
+    required this.value,
+  });
+
+  final String code;
+  final String name;
+
+  /// 1 takes [value] cents off, 2 takes [value] percent off.
+  final int type;
+  final int value;
+
+  factory AccountCoupon.fromJson(Map<String, Object?> json) {
+    return AccountCoupon(
+      code: json['code'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      type: (json['type'] as num?)?.toInt() ?? 1,
+      value: (json['value'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  int discountFor(int cents) => type == 2
+      ? (cents * value / 100).round().clamp(0, cents)
+      : value.clamp(0, cents);
+}
+
+class AccountOrder {
+  const AccountOrder({
+    required this.tradeNo,
+    required this.planId,
+    required this.period,
+    required this.status,
+    required this.totalAmount,
+    required this.createdAt,
+  });
+
+  final String tradeNo;
+  final int planId;
+  final String period;
+
+  /// 0 unpaid, 1 opening, 2 cancelled, 3 done, 4 credited to a later order.
+  final int status;
+  final int totalAmount;
+  final DateTime createdAt;
+
+  factory AccountOrder.fromJson(Map<String, Object?> json) {
+    return AccountOrder(
+      tradeNo: json['trade_no'] as String? ?? '',
+      planId: (json['plan_id'] as num?)?.toInt() ?? 0,
+      period: json['period'] as String? ?? '',
+      status: (json['status'] as num?)?.toInt() ?? 0,
+      totalAmount: (json['total_amount'] as num?)?.toInt() ?? 0,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        ((json['created_at'] as num?)?.toInt() ?? 0) * 1000,
+      ),
+    );
+  }
+
+  bool get unpaid => status == 0;
+}
+
+class CheckinStatus {
+  const CheckinStatus({
+    required this.enabled,
+    required this.checkedToday,
+    required this.reason,
+  });
+
+  final bool enabled;
+  final bool checkedToday;
+
+  /// Why this account cannot check in, as the panel words it.
+  final String? reason;
+
+  factory CheckinStatus.fromJson(Map<String, Object?> json) {
+    return CheckinStatus(
+      enabled: json['enabled'] == true,
+      checkedToday: json['checked_today'] == true,
+      reason: json['reason'] as String?,
+    );
+  }
 }
 
 enum AccountStatus { restoring, loggedOut, loggedIn }

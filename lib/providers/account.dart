@@ -144,6 +144,93 @@ class Account extends _$Account {
     }
   }
 
+  /// Runs a panel call with the saved login; an expired login signs out.
+  Future<T> _signedIn<T>(
+    Future<T> Function(BrandConfig config, String authData) call,
+  ) async {
+    final authData = state.authData;
+    if (authData == null) {
+      throw const XboardException('请先登录', unauthorized: true);
+    }
+    try {
+      return await call(state.brand, authData);
+    } on XboardException catch (e) {
+      if (e.unauthorized) {
+        await logout(message: '登录已过期，请重新登录');
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<AccountPlan>> plans() => _signedIn(_xboard.plans);
+
+  Future<List<PaymentMethod>> paymentMethods() =>
+      _signedIn(_xboard.paymentMethods);
+
+  Future<AccountCoupon> checkCoupon(
+    String code,
+    AccountPlan plan,
+    PlanPeriod period,
+  ) => _signedIn(
+    (config, authData) => _xboard.checkCoupon(
+      config,
+      authData,
+      code: code,
+      planId: plan.id,
+      period: period,
+    ),
+  );
+
+  Future<String> saveOrder(
+    AccountPlan plan,
+    PlanPeriod period,
+    String? couponCode,
+  ) => _signedIn(
+    (config, authData) => _xboard.saveOrder(
+      config,
+      authData,
+      planId: plan.id,
+      period: period,
+      couponCode: couponCode,
+    ),
+  );
+
+  Future<({int type, Object? data})> checkout(String tradeNo, int methodId) =>
+      _signedIn(
+        (config, authData) => _xboard.checkout(
+          config,
+          authData,
+          tradeNo: tradeNo,
+          methodId: methodId,
+        ),
+      );
+
+  Future<int> orderStatus(String tradeNo) => _signedIn(
+    (config, authData) => _xboard.orderStatus(config, authData, tradeNo),
+  );
+
+  Future<List<AccountOrder>> unpaidOrders() async {
+    final orders = await _signedIn(_xboard.orders);
+    return [
+      for (final order in orders)
+        if (order.unpaid) order,
+    ];
+  }
+
+  Future<void> cancelOrder(String tradeNo) => _signedIn(
+    (config, authData) => _xboard.cancelOrder(config, authData, tradeNo),
+  );
+
+  Future<CheckinStatus> checkinStatus() => _signedIn(_xboard.checkinStatus);
+
+  Future<({bool success, String message})> checkin() async {
+    final result = await _signedIn(_xboard.checkin);
+    if (result.success) {
+      unawaited(refresh());
+    }
+    return result;
+  }
+
   Future<List<AccountNotice>> unseenPopupNotices() async {
     final authData = state.authData;
     if (authData == null) return const [];

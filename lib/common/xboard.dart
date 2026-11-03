@@ -126,10 +126,197 @@ class XboardClient {
     ];
   }
 
+  Future<List<AccountPlan>> plans(BrandConfig config, String authData) async {
+    final data = await _request(
+      config,
+      (base) =>
+          _dio.get<Object?>('$base/user/plan/fetch', options: _auth(authData)),
+    );
+    return [
+      for (final item in data is List ? data : const [])
+        if (item is Map<String, Object?>) AccountPlan.fromJson(item),
+    ];
+  }
+
+  Future<List<PaymentMethod>> paymentMethods(
+    BrandConfig config,
+    String authData,
+  ) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/order/getPaymentMethod',
+        options: _auth(authData),
+      ),
+    );
+    return [
+      for (final item in data is List ? data : const [])
+        if (item is Map<String, Object?>) PaymentMethod.fromJson(item),
+    ];
+  }
+
+  Future<AccountCoupon> checkCoupon(
+    BrandConfig config,
+    String authData, {
+    required String code,
+    required int planId,
+    required PlanPeriod period,
+  }) async {
+    final data = await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/coupon/check',
+        data: {'code': code, 'plan_id': planId, 'period': period.key},
+        options: _auth(authData, form: true),
+      ),
+    );
+    if (data is! Map<String, Object?>) {
+      throw const XboardException('优惠券无效');
+    }
+    return AccountCoupon.fromJson(data);
+  }
+
+  /// Returns the trade number of the new unpaid order.
+  Future<String> saveOrder(
+    BrandConfig config,
+    String authData, {
+    required int planId,
+    required PlanPeriod period,
+    String? couponCode,
+  }) async {
+    final data = await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/order/save',
+        data: {
+          'plan_id': planId,
+          'period': period.key,
+          if (couponCode != null && couponCode.isNotEmpty)
+            'coupon_code': couponCode,
+        },
+        options: _auth(authData, form: true),
+      ),
+    );
+    if (data is! String || data.isEmpty) {
+      throw const XboardException('下单失败，请稍后重试');
+    }
+    return data;
+  }
+
+  /// type -1: settled without paying (balance or a free order); type 1: a
+  /// payment page URL in data; type 0: a QR code payload in data.
+  Future<({int type, Object? data})> checkout(
+    BrandConfig config,
+    String authData, {
+    required String tradeNo,
+    required int methodId,
+  }) async {
+    final body = await _requestBody(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/order/checkout',
+        data: {'trade_no': tradeNo, 'method': methodId},
+        options: _auth(authData, form: true),
+      ),
+    );
+    return (type: (body['type'] as num?)?.toInt() ?? 1, data: body['data']);
+  }
+
+  Future<int> orderStatus(
+    BrandConfig config,
+    String authData,
+    String tradeNo,
+  ) async {
+    final data = await _request(
+      config,
+      (base) => _dio.get<Object?>(
+        '$base/user/order/check',
+        queryParameters: {'trade_no': tradeNo},
+        options: _auth(authData),
+      ),
+    );
+    return (data as num?)?.toInt() ?? 0;
+  }
+
+  Future<List<AccountOrder>> orders(BrandConfig config, String authData) async {
+    final data = await _request(
+      config,
+      (base) =>
+          _dio.get<Object?>('$base/user/order/fetch', options: _auth(authData)),
+    );
+    return [
+      for (final item in data is List ? data : const [])
+        if (item is Map<String, Object?>) AccountOrder.fromJson(item),
+    ];
+  }
+
+  Future<void> cancelOrder(
+    BrandConfig config,
+    String authData,
+    String tradeNo,
+  ) async {
+    await _request(
+      config,
+      (base) => _dio.post<Object?>(
+        '$base/user/order/cancel',
+        data: {'trade_no': tradeNo},
+        options: _auth(authData, form: true),
+      ),
+    );
+  }
+
+  Future<CheckinStatus> checkinStatus(
+    BrandConfig config,
+    String authData,
+  ) async {
+    final data = await _request(
+      config,
+      (base) =>
+          _dio.get<Object?>('$base/user/checkin', options: _auth(authData)),
+    );
+    if (data is! Map<String, Object?>) {
+      throw const XboardException('签到功能暂不可用');
+    }
+    return CheckinStatus.fromJson(data);
+  }
+
+  /// The traffic it granted on success, the panel's reason otherwise.
+  Future<({bool success, String message})> checkin(
+    BrandConfig config,
+    String authData,
+  ) async {
+    final body = await _requestBody(
+      config,
+      (base) =>
+          _dio.post<Object?>('$base/user/checkin', options: _auth(authData)),
+    );
+    final data = body['data'];
+    final success = data is Map && data['success'] == true;
+    return (
+      success: success,
+      message: success
+          ? '${data['traffic'] ?? ''}'
+          : body['message'] as String? ?? '签到失败，请稍后重试',
+    );
+  }
+
+  Options _auth(String authData, {bool form = false}) => Options(
+    headers: {'Authorization': authData},
+    contentType: form ? Headers.formUrlEncodedContentType : null,
+  );
+
   /// Tries the last address that answered, then the rest in order. An answer
   /// from the panel, error or not, ends the search: only an unreachable
   /// address moves on to the next.
   Future<Object?> _request(
+    BrandConfig config,
+    Future<Response<Object?>> Function(String base) send,
+  ) async {
+    final body = await _requestBody(config, send);
+    return body['data'];
+  }
+
+  Future<Map<Object?, Object?>> _requestBody(
     BrandConfig config,
     Future<Response<Object?>> Function(String base) send,
   ) async {
@@ -144,7 +331,7 @@ class XboardClient {
         final response = await send(base);
         await preferences.setString(_apiKey, base);
         final body = response.data;
-        return body is Map ? body['data'] : null;
+        return body is Map ? body : const {};
       } on DioException catch (e) {
         final status = e.response?.statusCode;
         final body = e.response?.data;
