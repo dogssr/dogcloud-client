@@ -9,3 +9,4 @@ export 'register.dart';
 export 'section.dart';
 export 'strings.dart';
 export 'tickets.dart';
+export 'update.dart';

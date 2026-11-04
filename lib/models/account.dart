@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:fl_clash/common/brand.dart';
+import 'package:fl_clash/common/package.dart';
 
 class AccountSubscription {
   const AccountSubscription({
@@ -77,6 +80,8 @@ class BrandConfig {
     this.latestVersion,
     this.downloadUrls = const {},
     this.releaseNotes,
+    this.minVersion,
+    this.snoozeDays = 3,
   });
 
   final List<String> apiUrls;
@@ -86,6 +91,10 @@ class BrandConfig {
   /// Keyed by `Platform.operatingSystem`.
   final Map<String, String> downloadUrls;
   final String? releaseNotes;
+
+  /// Older builds must update, though the user may put it off [snoozeDays].
+  final String? minVersion;
+  final int snoozeDays;
 
   static final defaults = BrandConfig(
     apiUrls: splitBrandUrls(brandApiUrls),
@@ -112,8 +121,34 @@ class BrandConfig {
             if (key is String && value is String) key: value,
       },
       releaseNotes: latest is Map ? latest['notes'] as String? : null,
+      minVersion: latest is Map
+          ? latest['min_version'] as String? ??
+                (latest['force'] == true ? latest['version'] as String? : null)
+          : null,
+      snoozeDays: latest is Map
+          ? (latest['snooze_days'] as num?)?.toInt() ?? 3
+          : 3,
     );
   }
+
+  String? requiredUpdateFor(String version) {
+    final latest = latestVersion;
+    final minimum = minVersion;
+    if (latest == null || minimum == null) return null;
+    try {
+      final outdated =
+          compareVersions(minimum, version) > 0 &&
+          compareVersions(latest, version) > 0;
+      return outdated ? latest : null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  String get downloadUrl =>
+      downloadUrls[Platform.operatingSystem] ??
+      downloadUrls['default'] ??
+      siteUrl;
 
   String get shopUrl => '$siteUrl/#/shop';
   String get registerUrl => '$siteUrl/#/register';

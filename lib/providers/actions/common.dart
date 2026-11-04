@@ -146,6 +146,8 @@ class CommonAction extends _$CommonAction {
     Map<String, dynamic>? data,
     bool isUser = false,
   }) async {
+    // AccountGate asks for a required release itself, with its own snooze.
+    if (!isUser && data?['required'] == true) return;
     if (data != null) {
       final context = globalState.navigatorKey.currentContext!;
       final res = await dialogs.showMessage(

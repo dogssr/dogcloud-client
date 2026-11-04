@@ -156,4 +156,20 @@ void main() {
     await shown;
     expect(container.read(appSettingProvider).autoCheckUpdate, isTrue);
   });
+
+  testWidgets('an automatic check leaves a required update to the brand', (
+    tester,
+  ) async {
+    final container = await pumpApp(tester);
+
+    await container
+        .read(commonActionProvider.notifier)
+        .checkUpdateResultHandle(
+          data: {...release(_bulletsOnly), 'required': true},
+        );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextButton), findsNothing);
+    expect(container.read(appSettingProvider).autoCheckUpdate, isTrue);
+  });
 }

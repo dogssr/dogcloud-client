@@ -153,4 +153,27 @@ void main() {
       DateTime.fromMillisecondsSinceEpoch(1700000000 * 1000),
     );
   });
+
+  test('a minimum version makes older builds update', () {
+    final config = BrandConfig.fromJson(const {
+      'latest': {'version': '4.1.0', 'min_version': '4.0.5', 'snooze_days': 2},
+    });
+    expect(config.snoozeDays, 2);
+    expect(config.requiredUpdateFor('4.0.0'), '4.1.0');
+    expect(config.requiredUpdateFor('4.0.5'), isNull);
+    expect(config.requiredUpdateFor('4.1.0'), isNull);
+    expect(config.requiredUpdateFor('beta'), isNull);
+
+    final forced = BrandConfig.fromJson(const {
+      'latest': {'version': '4.1.0', 'force': true},
+    });
+    expect(forced.minVersion, '4.1.0');
+    expect(forced.snoozeDays, 3);
+    expect(forced.requiredUpdateFor('4.0.9'), '4.1.0');
+
+    final optional = BrandConfig.fromJson(const {
+      'latest': {'version': '4.1.0'},
+    });
+    expect(optional.requiredUpdateFor('4.0.0'), isNull);
+  });
 }

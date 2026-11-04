@@ -161,6 +161,15 @@ class AccountStrings {
     return days > 0 ? '${days}d ${hours}h left' : '${left.inHours}h left';
   }
 
+  String get updateRequired => _zh ? '需要更新' : 'Update required';
+  String get updateNow => _zh ? '立即更新' : 'Update now';
+
+  String updateMessage(String version) => _zh
+      ? '当前版本已停止支持，请更新到 v$version 继续使用。'
+      : 'This version is no longer supported. Please update to v$version.';
+
+  String remindIn(int days) => _zh ? '$days 天后提醒' : 'Remind me in $days days';
+
   String get checkin => _zh ? '签到' : 'Check in';
   String get checkedIn => _zh ? '今日已签到' : 'Checked in';
 

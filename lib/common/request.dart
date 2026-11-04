@@ -98,10 +98,8 @@ class Request {
     return {
       'tag_name': 'v$latest',
       'body': config.releaseNotes,
-      'html_url':
-          config.downloadUrls[Platform.operatingSystem] ??
-          config.downloadUrls['default'] ??
-          config.siteUrl,
+      'html_url': config.downloadUrl,
+      'required': config.requiredUpdateFor(version) != null,
     };
   }
 
