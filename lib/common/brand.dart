@@ -7,7 +7,9 @@ const brandApiUrls = String.fromEnvironment(
 
 const brandConfigUrls = String.fromEnvironment(
   'BRAND_CONFIG_URLS',
-  defaultValue: 'https://web2.dogssr.site/app/config.json',
+  defaultValue:
+      'https://dogssr-1329938531.cos.ap-guangzhou.myqcloud.com/config.json,'
+      'https://web2.dogssr.site/app/config.json',
 );
 
 const brandSiteUrl = String.fromEnvironment(
