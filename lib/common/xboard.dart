@@ -48,6 +48,8 @@ class XboardClient {
           options: Options(
             responseType: ResponseType.plain,
             receiveTimeout: const Duration(seconds: 6),
+            // The COS bucket's hotlink rule turns away requests without one.
+            headers: {'Referer': '$brandSiteUrl/'},
           ),
         );
         final body = response.data ?? '';
